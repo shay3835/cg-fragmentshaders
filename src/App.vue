@@ -22,15 +22,15 @@ export default {
             materials: {},
             selected_texture: 'video',
             textures: {video: null, webcam: null},
-            start_stop: 'Stop'
+            start_stop: 'Stop',
         }
     },
     methods: {
         createShaderMaterial(shader, scene) {
             let material = new ShaderMaterial(shader, scene, BASE_URL + 'shaders/' + shader, {
                 attributes: ['position', 'uv'],
-                uniforms: ['worldViewProjection'],
-                samplers: ['image']
+                uniforms: ['worldViewProjection', 'time'],
+                samplers: ['image'],
             });
             material.backFaceCulling = false;
             return material;
@@ -125,7 +125,7 @@ export default {
         // Associate a Babylon Render Engine to it.
         const engine = new Engine(this.gl);
 
-        // Create our first scene.
+       this.materials // Create our first scene.
         this.scene = new Scene(engine);
         this.scene.useRightHandedSystem = true;
         this.scene.skipFrustumClipping = true;
@@ -181,6 +181,8 @@ export default {
         // Assign triangle a material
         rect.material = this.materials.standard;
 
+        let startTime = Date.now();
+
         // Animation function - called before each frame gets rendered
         this.scene.onBeforeRenderObservable.add(() => {
             if (this.filter !== rect.material.name) {
@@ -190,6 +192,10 @@ export default {
             if (this.textures[this.selected_texture] !== null) {
                 this.materials[this.filter].setTexture('image', this.textures[this.selected_texture]);
             }
+
+            let currentTime = (Date.now() - startTime) / 1000;
+            this.materials[this.filter].setFloat('time', currentTime);
+            
         });
 
         // Render every frame
@@ -222,7 +228,7 @@ export default {
             <p id="toon">Toonify</p>
         </div>
         <div id="custom_button" class="filter_button">
-            <p id="custom">Custom</p>
+            <p id="custom">Oilslick</p>
         </div>
     </div>
     <div class="spacer"></div>
